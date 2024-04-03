@@ -1,0 +1,16 @@
+﻿  testdatatransfer.cpp
+  mp_dy_1_4000_bulk_speed.cpp
+D:\Datatransfer\ADQAPI\setting.h(1,1): warning C4828: 文件包含在偏移 0x920 处开始的字符，该字符在当前源字符集中无效(代码页 936)。
+D:\Datatransfer\ADQAPI\setting.h(14,26): warning C4244: “初始化”: 从“__int64”转换到“unsigned int”，可能丢失数据
+D:\Datatransfer\ADQAPI\setting.h(15,33): warning C4244: “初始化”: 从“double”转换到“unsigned int”，可能丢失数据
+D:\Datatransfer\Datatransfer\write_setting.cpp(33,43): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(301,62): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(307,62): warning C4244: “参数”: 从“int64_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(323,62): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(329,62): warning C4244: “参数”: 从“int64_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(345,62): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(351,62): warning C4244: “参数”: 从“int64_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(367,62): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+D:\Datatransfer\Datatransfer\mp_dy_1_4000_bulk_speed.cpp(373,62): warning C4244: “参数”: 从“int64_t”转换到“int”，可能丢失数据
+  正在生成代码...
+  Datatransfer.vcxproj -> D:\Datatransfer\x64\Debug\Datatransfer.exe

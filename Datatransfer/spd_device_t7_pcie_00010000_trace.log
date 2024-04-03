@@ -1,0 +1,22 @@
+---------------------------------------------------------------------
+Log and error trace from ADQ of type     7
+---------------------------------------------------------------------
+
+[Log Header]
+Operating System       : Windows 8 Unknown architecture
+Device type (integral) : 7
+API Revision           : 0059694
+API DLL Path           : C:\WINDOWS\SYSTEM32\ADQAPI.dll
+DLL calling executable : D:\Datatransfer\x64\Debug\Datatransfer.exe
+[End of Log Header]
+
+Communication interface: PCIe (Link negotiated as x00g00)
+Physical interface     : PCIe or PXIe
+WARN : (ADQ7::ResynchronizeJESD:7456) : FPGA JESD204B IP 1 IP reports buffer adjustment 0
+WARN : (ADQ7::ResynchronizeJESD:7489) : FPGA JESD204B ADC1 IP reports sync not achieved.
+WARN : (ADQ7::ResynchronizeJESD:7456) : FPGA JESD204B IP 2 IP reports buffer adjustment 0
+WARN : Failed synchronize JESD link. Resynchronizing.
+<TID:0x2268> ERROR: (ADQ::GetStreamErrors:1162) : This function is not supported by the device.
+--------------------------
+End of Log Session for ADQ
+--------------------------
