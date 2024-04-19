@@ -48,14 +48,6 @@ unsigned int timer_time_ms(unsigned int index) {
 	}
 	return (unsigned int)((float)(t - tref[index]) * 1000.0f / CLOCKS_PER_SEC);
 }
-float timer_time_us(unsigned int index) {
-	clock_t t = clock();
-	if (t < 0) {
-		printf("\nFailed to get system time.");
-		return -1;
-	}
-	return ((float)(t - tref[index]) * 1000.0f * 1000.0f / CLOCKS_PER_SEC);
-}
 #endif
 
 unsigned int stream_error[8];
@@ -106,14 +98,14 @@ struct file_inform
 	int64_t data_bytes;
 	int64_t header_bytes;
 };
-int count_record = 0;//产生了多少个rcd
+int count_record = 0;//total number of cells
 int count_record_last = 0;
 double* speed_store;
 int count_speed = 0;
 double* MaxDRAMFillLevel;// %8.4f%%
 double* maxbufferused;// %4u
 int effict_write = 0;
-static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, void* pBuf, size_t datasize, int record)  //多少个点
+static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, void* pBuf, size_t datasize, int record)  //澶氬皯涓偣
 {
 	timer_start(6);
 	file_inform* alt_file_inform = (file_inform*)malloc(sizeof(file_inform));
@@ -128,7 +120,7 @@ static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, v
 	char filename[256] = "";
 	FILE* fp = NULL;
 	size_t bytes_written = 0;
-	sprintf(filename, "%s_r%d.bin", FILENAME_DATA, record);//写数据头
+	sprintf(filename, "%s_r%d.bin", FILENAME_DATA, record);
 
 	fp = fopen(filename, "wb");
 	if (fp == NULL)
@@ -145,8 +137,7 @@ static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, v
 		return -1;
 	}
 
-	bytes_written = fwrite(phead, 1, sizeof(ADQRecordHeader) * headnum, fp);//写多少个点
-	//printf("aaa%d bbbbb%d\n", sizeof(ADQRecordHeader) * headnum, bytes_written);
+	bytes_written = fwrite(phead, 1, sizeof(ADQRecordHeader) * headnum, fp);//Write the data header to a file
 	if (bytes_written != sizeof(ADQRecordHeader) * headnum)
 	{
 		printf("Failed to write %zu bytes to the file '%s', wrote %zu bytes.\n", sizeof(ADQRecordHeader) * headnum, filename, bytes_written);
@@ -154,7 +145,7 @@ static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, v
 		return -1;
 	}
 
-	bytes_written = fwrite(pBuf, 2, datasize, fp);//写多少个点
+	bytes_written = fwrite(pBuf, 2, datasize, fp);//Write the data to a file
 	if (bytes_written != datasize)
 	{
 		printf("Failed to write %zu bytes to the file '%s', wrote %zu bytes.\n", datasize * 2, filename, bytes_written);
@@ -168,8 +159,7 @@ static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, v
 	tr_bytes = tr_bytes + datasize * 2 + sizeof(ADQRecordHeader) * headnum;
 	tr_bytes_since_last_print = tr_bytes_since_last_print + datasize * 2 + sizeof(ADQRecordHeader) * headnum;
 	time_diff = timer_time_ms(1) - time_stamped;
-	//if (tr_bytes_since_last_print > (1024ULL * 1024ULL * 1024ULL) && time_diff > 50)
-	if (time_diff > 999)
+	if (time_diff > 999)//Throughput of writes to SSD is recorded at one second intervals
 	{
 		time_stamped = timer_time_ms(1);
 		tr_speed_now = ((double)tr_bytes_since_last_print / (1024.0 * 1024.0)) / ((double)time_diff / 1000.0);
@@ -220,7 +210,6 @@ int write_file(double* data, int count,int mode)
 		//printf("is  %s\n", b);
 	}
 
-	//fwrite(speed_add, 4, count, fp);
 	fclose(fp);
 	return 0;
 }
@@ -384,42 +373,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type) {
 
 	trig_mode = ADQ_INTERNAL_TRIGGER_MODE;
 
-	//printf("\nChoose configuration mode:\n - 0 is run with default settings [DEFAULT]\n - 1 is for enabling configuration settings\n - 2 is for enabling advanced settings\n");
-	//scanf(" %d", &config_mode);
-	//if ((config_mode < 0) || (config_mode > 2))
-	//	config_mode = 0;
-
-	//max_run_time = RUN_TIME_DEFAULT;
-	//test_speed_mbyte = 1024; // 1 GByte/sec is default
-	//trig_freq = 1000; // Set default 1 kHz trigger
-	//if (config_mode > 0)
-	//{
-	//	printf("\nChoose parsing mode:\n 1 is full parsed mode [DEFAULT]\n 2 is no user-parsing mode\n 3 is RAW mode\n");
-	//	scanf("%d", &parse_mode);
-	//	if ((parse_mode > 3) && (parse_mode < 1))
-	//	{
-			//parse_mode = 1;
-		//}
-
-		//printf("\nChoose desired run time in seconds. (0 is DEFAULT which is 30 seconds, -1 is infinite run)\n");
-		//scanf("%d", &max_run_time);
-		//if (max_run_time == 0)
-			//max_run_time = RUN_TIME_DEFAULT;
-
-		//printf("\nChoose desired transfer speed in MByte/s to testPoint for (0 is default testPoint)\n");
-		//scanf("%d", &test_speed_mbyte);
-		//if (test_speed_mbyte == 0)
-		//{
-		//	test_speed_mbyte = 1024; // 1 GByte/sec is default
-		//}
-
-		//printf("\nNOTE: Higher trigger rates will use shorter records, which will in turn create more overhead.\n");
-		//printf("\nChoose desired trigger rate used for testPoint (0 is default at 1kHz)\n");
-		//scanf("%d", &trig_freq);
-		//if (trig_freq == 0)
-		//	trig_freq = 1000; // Set default 1 kHz trigger
-	//}
-
 	// Max is around 98% duty-cycle per channel
 	ADQ_GetSampleRate(adq_cu, adq_num, 0, &sampleratehz);
 	max_mbyte_per_second_per_channel = ((((sampleratehz * 98.0) / 100.0) * 2.0) / 1024.0 / 1024.0);
@@ -447,30 +400,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type) {
 
 	average_rate_per_channel = (double)test_speed_mbyte / (double)use_nof_channels;
 
-	//if (config_mode == 2)
-	//{
-	//	printf("\nSet number of kernel buffers (0 is %u [DEFAULT], other values for the number of buffers)\n", tr_buf_no);
-	//	scanf("%d", &sel_tr_buf_no);
-	//	if (sel_tr_buf_no == 0)
-			//sel_tr_buf_no = tr_buf_no;
-
-		//printf("\nSet size of kernel buffers in kb (0 is %u [DEFAULT], other values for the size in kb)\n", tr_buf_size / 1024);
-		//scanf("%d", &sel_tr_buf_size);
-		//if (sel_tr_buf_size == 0)
-		//	sel_tr_buf_size = tr_buf_size;
-		//else
-			//sel_tr_buf_size *= 1024;
-
-		//printf("\nSet periodic report interval (0 is %u [DEFAULT], other values for the interval in Mbyte)\n", (unsigned int)PRINT_EVERY_N_MBYTES_DEFAULT);
-		//scanf("%u", &periodic_report_interval);
-		//if (periodic_report_interval == 0)
-			//periodic_report_interval = PRINT_EVERY_N_MBYTES_DEFAULT;
-	//}
-
-	//samples_per_record_d = (unsigned int)(((double)average_rate_per_channel * 1024.0 * 1024.0) / ((double)trig_freq * 2.0));
-	//samples_per_record = ((((unsigned int)samples_per_record_d + 31) / 32) * 32);
-
-	//trig_period = (unsigned int)(sampleratehz / (double)trig_freq);
 	printf(" Trigger period calculated to %u clock-cycles.\n", trig_period);
 	CHECKADQ(ADQ_SetTriggerMode(adq_cu, adq_num, trig_mode));
 	CHECKADQ(ADQ_SetInternalTriggerPeriod(adq_cu, adq_num, trig_period));
@@ -546,13 +475,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type) {
 		}
 	}
 
-	// Allocate memory for record data (used for ProcessRecord function template)
-	/*record_data = (short int*)malloc((size_t)(sizeof(short) * samples_per_record));
-	if (!record_data) {
-		printf("Failed to allocate memory for record data\n");
-		goto error;
-	}*/
-
 	// Compute the sum of the number of records specified by the user
 	for (ch = 0; ch < 4; ++ch) {
 		if (!((1 << ch) & channelsmask))
@@ -573,10 +495,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type) {
 		pretrig_samples,
 		triggerdelay_samples,
 		channelsmask));
-
-	//printf("\nPress ENTER to start testPoint.\n");
-	//getchar();
-	//getchar();
 
 	// Commands to start the triggered streaming mode after setup
 	CHECKADQ(ADQ_SetStreamStatus(adq_cu, adq_num, 1));
@@ -687,7 +605,7 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type) {
 				//}
 
 				write_header_record_to_file(target_headers[ch], headers_done, target_buffers[ch],
-					samples_added[ch], count_record);//-写细胞数据
+					samples_added[ch], count_record);//-write cell data into files
 				count_record++;
 
 			}
