@@ -1,24 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS // This define removes warnings for printf
 #define _CRT_SECURE_NO_DEPRECATE
 
-/*-----------------------------------------------------------------------------------
-	¹¦ÄÜ£º targetbuffer¶¯Ì¬·ÖÅä¡¢head¶¯Ì¬·ÖÅä¡¢¡¾head¡¿Ğ´ÎÄ¼ş¡¾buffer¡¿Ğ´ÎÄ¼ş
-	ËµÃ÷£º Ã¿»ñÈ¡Ò»´Îhead¡¢buffer£¬¶¼Ğ´Èëµ¥¸öÎÄ¼ş£¬¼´headĞ´µÄÊÇĞ¡ÎÄ¼ş
-	²ÎÊı£º
-				header¶¯Ì¬·ÖÅä 10 * 1024
-	ËÙ¶È²âÊÔ£º
-	//		setting:
-						trig_period = 10000000000 / 8000;
-						samples_per_record = 1024*120;
-						max_run_time = 30;
-						sel_tr_buf_no = 150;
-						sel_tr_buf_size = 2 *1024 * 1024 * sizeof(short);
-
-			speed£º1875.00 Mbyte/s
-
-	¡¾ÒÑÑéÖ¤Ï¸°û²»»á¶Ï¡¿
------------------------------------------------------------------------------------------*/
-
 
 #include <iostream>
 #include <fstream>
@@ -133,7 +115,7 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type);
 
 // THE FOLLOWING DEFINE IS ONLY AVAILABLE FOR USB DEVICES
 // #define NONPOLLING_TRANSFER_STATUS
-#include <cstring>//±ØĞëÒıÓÃ
+#include <cstring>//å¿…é¡»å¼•ç”¨
 #define consume  1  //16
 
 int bulk_order = 0;
@@ -155,10 +137,10 @@ struct file_inform
 	int64_t header_bytes;
 };
 
-int count_record = 0;//²úÉúÁË¶àÉÙ¸örcd
+int count_record = 0;//äº§ç”Ÿäº†å¤šå°‘ä¸ªrcd
 
 moodycamel::BlockingConcurrentQueue<nodes> q;
-int popOver = 1;//Ã¿¸öconsumerÓĞÃ»ÓĞ½áÊø 
+int popOver = 1;//æ¯ä¸ªconsumeræœ‰æ²¡æœ‰ç»“æŸ 
 
 
 double* speed_store;
@@ -175,7 +157,7 @@ void* produceItem(void* adq_cu, int adq_num, int adq_type)//adq_data_tsfer
 	return((void*)0);
 }
 int effect_time_write = 0;
-static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, void* pBuf, size_t datasize, int record)  //¶àÉÙ¸öµã
+static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, void* pBuf, size_t datasize, int record)  //å¤šå°‘ä¸ªç‚¹
 {
 	//timer_start(15);		
 	file_inform* alt_file_inform = (file_inform*)malloc(sizeof(file_inform));
@@ -189,7 +171,7 @@ static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, v
 
 	char filename[256] = "";
 	size_t bytes_written = 0;
-	sprintf(filename, "%s_r%d.bin", FILENAME_DATA, record);//Ğ´Êı¾İÍ·
+	sprintf(filename, "%s_r%d.bin", FILENAME_DATA, record);
 	fstream file(filename, ios::out | ios::binary);
 
 	file.write(reinterpret_cast<char*>(alt_file_inform), sizeof(file_inform));
@@ -204,7 +186,6 @@ static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, v
 	tr_bytes = tr_bytes + datasize * 2 + sizeof(ADQRecordHeader) * headnum;
 	tr_bytes_since_last_print = tr_bytes_since_last_print + datasize * 2 + sizeof(ADQRecordHeader) * headnum;
 	time_diff = timer_time_ms(1) - time_stamped;
-	//if (tr_bytes_since_last_print > (1024ULL * 1024ULL * 1024ULL) && time_diff > 50)
 	if (time_diff > 999)
 	{
 		time_stamped = timer_time_ms(1);
@@ -214,8 +195,6 @@ static int write_header_record_to_file(ADQRecordHeader* phead, size_t headnum, v
 		MaxDRAMFillLevel[count_speed] = 100.0 * (double)(adq_dram_size_per_count * (unsigned long long)dram_wrcnt_max) / (double)(adq_dram_size_bytes);
 		maxbufferused[count_speed] = max_used_tr_buf;
 		count_speed++;
-		//printf("/\n Transfer speed actual effective (%12llu Mbyte, %9d ms, %8.2f Mbyte/sec)\n", tr_bytes_since_last_print / 1024 / 1024, time_diff, tr_speed_now);
-		//printf(" Transfer speed total effective  (%12llu Mbyte, %9u ms, %8.2f Mbyte/sec)\n", tr_bytes / 1024 / 1024, time_stamped, tr_speed);
 		tr_bytes_since_last_print = 0;
 	}
 
@@ -276,7 +255,7 @@ void* consumeItem1(int ID)
 		for (int jjj = 0; jjj < counttt; jjj++)
 		{
 			timer_start(ID * 3 + 5);	
-			write_header_record_to_file(tmp[jjj].head_address, tmp[jjj].header_number, tmp[jjj].data_address, tmp[jjj].data_bytes / 2, tmp[jjj].file_number);//-Ğ´Ï¸°ûÊı¾İ
+			write_header_record_to_file(tmp[jjj].head_address, tmp[jjj].header_number, tmp[jjj].data_address, tmp[jjj].data_bytes / 2, tmp[jjj].file_number);//-å†™ç»†èƒæ•°æ®
 			//printf("%f\n", timer_time_us(ID * 3 + 5));	
 			effict_time[ID] += timer_time_ms(ID * 3 + 5);
 			timer_start(ID * 3 + 6);
@@ -417,16 +396,14 @@ void adq_transfer_test(void* adq_cu, int adq_num, int adq_type)
 	thread t0(consumeItem1, 0);
 	thread t1(consumeItem1, 1);
 	thread t2(consumeItem1, 2);
-	thread t3(consumeItem1, 3); //thread t4(consumeItem1, 4);
-	//thread t5(consumeItem1, 3); thread t6(consumeItem1, 4);
-	//thread t7(consumeItem1, 3); thread t8(consumeItem1, 4);
-	//	adq_perform_transfer_test(adq_cu, adq_num, adq_type);
+	thread t3(consumeItem1, 3);
+
 
 	t.join();
 	t0.join();
 	t1.join();
 	t2.join();
-	t3.join(); //t4.join();t5.join(); t6.join(); t7.join(); t8.join();
+	t3.join();
 	printf("The whole project is completed!\n");
 	write_file(speed_store, count_speed, 1);
 	write_file(MaxDRAMFillLevel, count_speed, 2);
@@ -452,10 +429,7 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 	unsigned int nof_records = 0;
 	unsigned int records_completed[4] = { 0, 0, 0, 0 };
 	unsigned char channelsmask;
-	//	unsigned int tr_buf_size = KERNEL_TR_BUF_SIZE;
-	//	unsigned int tr_buf_no = KERNEL_TR_BUF_NO;
-		//unsigned int trig_freq = 0;
-		//unsigned int trig_period = 0;
+
 	unsigned int timeout_ms = 1000;
 	int config_mode = 0;
 
@@ -495,41 +469,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 
 	trig_mode = ADQ_INTERNAL_TRIGGER_MODE;
 
-	//printf("\nChoose configuration mode:\n - 0 is run with default settings [DEFAULT]\n - 1 is for enabling configuration settings\n - 2 is for enabling advanced settings\n");
-	//scanf(" %d", &config_mode);
-	//if ((config_mode < 0) || (config_mode > 2))
-	//	config_mode = 0;
-
-	//max_run_time = RUN_TIME_DEFAULT;
-	//test_speed_mbyte = 1024; // 1 GByte/sec is default
-	//trig_freq = 1000; // Set default 1 kHz trigger
-	//if (config_mode > 0)
-	//{
-	//	printf("\nChoose parsing mode:\n 1 is full parsed mode [DEFAULT]\n 2 is no user-parsing mode\n 3 is RAW mode\n");
-	//	scanf("%d", &parse_mode);
-	//	if ((parse_mode > 3) && (parse_mode < 1))
-	//	{
-			//parse_mode = 1;
-		//}
-
-		//printf("\nChoose desired run time in seconds. (0 is DEFAULT which is 30 seconds, -1 is infinite run)\n");
-		//scanf("%d", &max_run_time);
-		//if (max_run_time == 0)
-			//max_run_time = RUN_TIME_DEFAULT;
-
-		//printf("\nChoose desired transfer speed in MByte/s to testPoint for (0 is default testPoint)\n");
-		//scanf("%d", &test_speed_mbyte);
-		//if (test_speed_mbyte == 0)
-		//{
-		//	test_speed_mbyte = 1024; // 1 GByte/sec is default
-		//}
-
-		//printf("\nNOTE: Higher trigger rates will use shorter records, which will in turn create more overhead.\n");
-		//printf("\nChoose desired trigger rate used for testPoint (0 is default at 1kHz)\n");
-		//scanf("%d", &trig_freq);
-		//if (trig_freq == 0)
-		//	trig_freq = 1000; // Set default 1 kHz trigger
-	//}
 
 	// Max is around 98% duty-cycle per channel
 	ADQ_GetSampleRate(adq_cu, adq_num, 0, &sampleratehz);
@@ -558,30 +497,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 
 	average_rate_per_channel = (double)test_speed_mbyte / (double)use_nof_channels;
 
-	//if (config_mode == 2)
-	//{
-	//	printf("\nSet number of kernel buffers (0 is %u [DEFAULT], other values for the number of buffers)\n", tr_buf_no);
-	//	scanf("%d", &sel_tr_buf_no);
-	//	if (sel_tr_buf_no == 0)
-			//sel_tr_buf_no = tr_buf_no;
-
-		//printf("\nSet size of kernel buffers in kb (0 is %u [DEFAULT], other values for the size in kb)\n", tr_buf_size / 1024);
-		//scanf("%d", &sel_tr_buf_size);
-		//if (sel_tr_buf_size == 0)
-		//	sel_tr_buf_size = tr_buf_size;
-		//else
-			//sel_tr_buf_size *= 1024;
-
-		//printf("\nSet periodic report interval (0 is %u [DEFAULT], other values for the interval in Mbyte)\n", (unsigned int)PRINT_EVERY_N_MBYTES_DEFAULT);
-		//scanf("%u", &periodic_report_interval);
-		//if (periodic_report_interval == 0)
-			//periodic_report_interval = PRINT_EVERY_N_MBYTES_DEFAULT;
-	//}
-
-	//samples_per_record_d = (unsigned int)(((double)average_rate_per_channel * 1024.0 * 1024.0) / ((double)trig_freq * 2.0));
-	//samples_per_record = ((((unsigned int)samples_per_record_d + 31) / 32) * 32);
-
-	//trig_period = (unsigned int)(sampleratehz / (double)trig_freq);
 	printf(" Trigger period calculated to %u clock-cycles.\n", trig_period);
 	CHECKADQ(ADQ_SetTriggerMode(adq_cu, adq_num, trig_mode));
 	CHECKADQ(ADQ_SetInternalTriggerPeriod(adq_cu, adq_num, trig_period));
@@ -636,34 +551,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 
 	timeout_ms = 5000; // Default to 5 seconds timeout
 
-	//// Allocate memory
-	//for (ch = 0; ch < 4; ch++) {
-	//	if (!((1 << ch) & channelsmask))
-	//		continue;
-	//	target_buffers[ch] = (short int*)malloc((size_t)sel_tr_buf_size);
-	//	if (!target_buffers[ch]) {
-	//		printf("Failed to allocate memory for target_buffers\n");
-	//		goto error;
-	//	}
-	//	target_headers[ch] = (struct ADQRecordHeader*)malloc((size_t)sel_tr_buf_size);
-	//	if (!target_headers[ch]) {
-	//		printf("Failed to allocate memory for target_headers\n");
-	//		goto error;
-	//	}
-	//	//target_buffers_extradata[ch] = (short int*)malloc((size_t)(sizeof(short) * samples_per_record));
-	//	//if (!target_buffers_extradata[ch]) {
-	//	//	printf("Failed to allocate memory for target_buffers_extradata\n");
-	//	//	goto error;
-	//	//}
-	//}
-
-	// Allocate memory for record data (used for ProcessRecord function template)
-	/*record_data = (short int*)malloc((size_t)(sizeof(short) * samples_per_record));
-	if (!record_data) {
-		printf("Failed to allocate memory for record data\n");
-		goto error;
-	}*/
-
 	// Compute the sum of the number of records specified by the user
 	for (ch = 0; ch < 4; ++ch) {
 		if (!((1 << ch) & channelsmask))
@@ -684,10 +571,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 		pretrig_samples,
 		triggerdelay_samples,
 		channelsmask));
-
-	//printf("\nPress ENTER to start testPoint.\n");
-	//getchar();
-	//getchar();
 
 	// Commands to start the triggered streaming mode after setup
 	CHECKADQ(ADQ_SetStreamStatus(adq_cu, adq_num, 1));
@@ -789,14 +672,7 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 				samples_added,
 				headers_added,
 				header_status));
-			//printf("target_headers %d  %d\n",
-			//	target_headers[0][0].RecordLength, target_headers[0][0].RecordNumber);
-			//·ÖÅäalt_bufferºÍalt_headerÓÃÓÚÈë¶Ó
-			/*short* alt_buffer = (short int*)malloc((size_t)sel_tr_buf_size);
-			struct ADQRecordHeader* alt_header = (struct ADQRecordHeader*)malloc((size_t)sel_tr_buf_size);
-			if ((!alt_buffer) || (!alt_header))
-				printf("there is no memory!!!!!!!!!!!\n");*/
-				//
+
 			nof_buffers_fetched++;
 			buffers_filled--;
 
@@ -805,8 +681,6 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 			// Parse the added samples
 			if (samples_added[ch] > 0)
 			{
-				/*if (headers_added[ch] > 0)
-				{*/
 				if (header_status[ch])
 					headers_done = headers_added[ch];
 				else
@@ -814,23 +688,13 @@ void adq_perform_transfer_test(void* adq_cu, int adq_num, int adq_type)
 
 				// If there is at least one complete header
 				records_completed[ch] += headers_done;
-				//}
-
-
-					/*samples_remaining = samples_added[ch];
-					memcpy(alt_buffer, target_buffers[ch], sizeof(short) * samples_added[ch]);
-					memcpy(alt_header, target_headers[ch], sizeof(struct ADQRecordHeader) * headers_done);
-					alt_node.data_address = alt_buffer;*/
 				bulk_order = count_record % num_bulk_queue;
 				alt_node[bulk_order].data_address = target_buffers[ch];
 				alt_node[bulk_order].data_bytes = sizeof(short) * samples_added[ch];
 				alt_node[bulk_order].file_number = count_record;
 				alt_node[bulk_order].head_address = target_headers[0];
 				alt_node[bulk_order].header_number = headers_done;
-				//q.enqueue(alt_node);
 				if (bulk_order == num_bulk_queue - 1)	q.enqueue_bulk(alt_node, num_bulk_queue);
-
-
 				count_record++;
 			}
 
