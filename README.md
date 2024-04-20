@@ -8,8 +8,8 @@
     Memory	Kingston DDR5 5200MHz 16GB
     SSD 	Kingston SKC3000D/2048G  Interface: M.2  Protocol: PCI-E 4.0×4 
   你需要运行：
-
-
+    Datatransfer/HSSS.cpp
+    Datatransfer/main.cpp
     （ADQ7DC向后传输的数据量是可控制的，在这里设置）
       设置方法：
   
