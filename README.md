@@ -1,8 +1,6 @@
 Running environment: win10 visual studio 2019
 
-You need to install the ADQ7DC driver in order for the ADQ API to be available in the code.
-
-  The ADQ7DC is our high speed acquisition card device that acquires data for transfer to PC.
+You need to install the ADQ7DC driver in order for the ADQ API to be available in the code. The ADQ7DC is our high speed acquisition card device that acquires data for transfer to PC.
   
 If you want to draw on the strategy of high-speed storage, you can just replace the API about the ADQ7DC with the API of your capture card.
 
