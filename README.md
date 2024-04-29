@@ -15,7 +15,7 @@ If you want to test the storage capacity of our high-speed streaming storage sys
     SSD 	Kingston SKC3000D/2048G  Interface: M.2  Protocol: PCI-E 4.0×4 
     
     
-  你需要运行：
+  You need to run:
   
     Datatransfer/HSSS.cpp
     
