@@ -9,6 +9,7 @@
 如果你想测试我们高速流存储系统的存储能力：
 
   你需要配备：
+  
     CPU	Intel Core i5-12600K @ 3.70GHz 10 cores/threads: 16
     
     Memory	Kingston DDR5 5200MHz 16GB
@@ -17,11 +18,11 @@
     
     
   你需要运行：
+  
     Datatransfer/HSSS.cpp
     
     Datatransfer/main.cpp
     
     ADQAPI/setting.h（ADQ7DC向后传输的数据量是可控制的，在这里设置）
     
-      设置方法：
   
