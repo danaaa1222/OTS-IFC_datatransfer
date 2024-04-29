@@ -1,14 +1,14 @@
-运行环境：Win10 visual studio 2019
+Running environment: win10 visual studio 2019
 
-你需要安装ADQ7DC驱动，以便代码中的ADQ API可用。
+You need to install the ADQ7DC driver in order for the ADQ API to be available in the code.
 
-  ADQ7DC是我们的高速采集卡设备，采集数据传输到PC。
+  The ADQ7DC is our high speed acquisition card device that acquires data for transfer to PC.
   
-如果你想借鉴高速存储的策略，可以用你的采集卡的API把有关ADQ7DC的API替代就可以了。
+If you want to draw on the strategy of high-speed storage, you can just replace the API about the ADQ7DC with the API of your capture card.
 
-如果你想测试我们高速流存储系统的存储能力：
+If you want to test the storage capacity of our high-speed streaming storage system:
 
-  你需要配备：
+  You need to equip:
   
     CPU	Intel Core i5-12600K @ 3.70GHz 10 cores/threads: 16
     
